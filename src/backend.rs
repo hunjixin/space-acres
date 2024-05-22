@@ -178,6 +178,40 @@ pub enum LoadingStep {
     },
 }
 
+impl LoadingStep {
+    fn basic_progress(&self) -> f32 {
+        match self {
+            LoadingStep::LoadingConfiguration => 0.0,
+            LoadingStep::ReadingConfiguration => 5.0,
+            LoadingStep::ConfigurationReadSuccessfully {
+                configuration_exists: _,
+            } => 10.0,
+            LoadingStep::CheckingConfiguration => 15.0,
+            LoadingStep::ConfigurationIsValid => 20.0,
+            LoadingStep::DecodingChainSpecification => 25.0,
+            LoadingStep::DecodedChainSpecificationSuccessfully => 30.0,
+            LoadingStep::CheckingNodePath => 35.0,
+            LoadingStep::CreatingNodePath => 40.0,
+            LoadingStep::NodePathReady => 45.0,
+            LoadingStep::PreparingNetworkingStack => 50.0,
+            LoadingStep::ReadingNetworkKeypair => 55.0,
+            LoadingStep::GeneratingNetworkKeypair => 60.0,
+            LoadingStep::WritingNetworkKeypair => 65.0,
+            LoadingStep::InstantiatingNetworkingStack => 70.0,
+            LoadingStep::NetworkingStackCreatedSuccessfully => 75.0,
+            LoadingStep::CreatingConsensusNode => 85.0,
+            LoadingStep::ConsensusNodeCreatedSuccessfully => 90.0,
+            LoadingStep::CreatingFarmer => 95.0,
+            LoadingStep::FarmerCreatedSuccessfully => 100.0,
+            LoadingStep::WipingFarm {
+                farm_index: _,
+                path: _,
+            } => 0.0,
+            LoadingStep::WipingNode { path: _ } => 0.0,
+        }
+    }
+}
+
 #[derive(Debug)]
 enum LoadedConsensusChainNode {
     Compatible(ConsensusNode),
@@ -616,7 +650,7 @@ async fn load_configuration(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::LoadingConfiguration,
-            progress: 0.0,
+            progress: LoadingStep::LoadingConfiguration.basic_progress(),
         })
         .await?;
 
@@ -625,19 +659,20 @@ async fn load_configuration(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::ReadingConfiguration,
-            progress: 0.0,
+            progress: LoadingStep::ReadingConfiguration.basic_progress(),
         })
         .await?;
 
     // TODO: Make configuration errors recoverable
     let maybe_config = RawConfig::read_from_path(&config_file_path).await?;
 
+    let step = LoadingStep::ConfigurationReadSuccessfully {
+        configuration_exists: maybe_config.is_some(),
+    };
     notifications_sender
         .send(BackendNotification::Loading {
-            step: LoadingStep::ConfigurationReadSuccessfully {
-                configuration_exists: maybe_config.is_some(),
-            },
-            progress: 0.0,
+            step: step.clone(),
+            progress: step.basic_progress(),
         })
         .await?;
 
@@ -652,7 +687,7 @@ async fn check_configuration(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::CheckingConfiguration,
-            progress: 0.0,
+            progress: LoadingStep::CheckingConfiguration.basic_progress(),
         })
         .await?;
 
@@ -661,7 +696,7 @@ async fn check_configuration(
             notifications_sender
                 .send(BackendNotification::Loading {
                     step: LoadingStep::ConfigurationIsValid,
-                    progress: 0.0,
+                    progress: LoadingStep::ConfigurationIsValid.basic_progress(),
                 })
                 .await?;
             Ok(Some(config))
@@ -685,7 +720,7 @@ async fn load_chain_specification(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::DecodingChainSpecification,
-            progress: 0.0,
+            progress: LoadingStep::DecodingChainSpecification.basic_progress(),
         })
         .await?;
 
@@ -695,7 +730,7 @@ async fn load_chain_specification(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::DecodedChainSpecificationSuccessfully,
-            progress: 0.0,
+            progress: LoadingStep::DecodedChainSpecificationSuccessfully.basic_progress(),
         })
         .await?;
 
@@ -709,7 +744,7 @@ async fn preparing_node_path(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::CheckingNodePath,
-            progress: 0.0,
+            progress: LoadingStep::CheckingNodePath.basic_progress(),
         })
         .await?;
 
@@ -723,7 +758,7 @@ async fn preparing_node_path(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::CreatingNodePath,
-            progress: 0.0,
+            progress: LoadingStep::CreatingNodePath.basic_progress(),
         })
         .await?;
 
@@ -739,7 +774,7 @@ async fn preparing_node_path(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::NodePathReady,
-            progress: 0.0,
+            progress: LoadingStep::NodePathReady.basic_progress(),
         })
         .await?;
 
@@ -763,7 +798,7 @@ async fn create_networking_stack(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::PreparingNetworkingStack,
-            progress: 0.0,
+            progress: LoadingStep::PreparingNetworkingStack.basic_progress(),
         })
         .await?;
 
@@ -782,7 +817,7 @@ async fn create_networking_stack(
         notifications_sender
             .send(BackendNotification::Loading {
                 step: LoadingStep::ReadingNetworkKeypair,
-                progress: 0.0,
+                progress: LoadingStep::ReadingNetworkKeypair.basic_progress(),
             })
             .await?;
 
@@ -799,7 +834,7 @@ async fn create_networking_stack(
         notifications_sender
             .send(BackendNotification::Loading {
                 step: LoadingStep::GeneratingNetworkKeypair,
-                progress: 0.0,
+                progress: LoadingStep::GeneratingNetworkKeypair.basic_progress(),
             })
             .await?;
 
@@ -808,7 +843,7 @@ async fn create_networking_stack(
         notifications_sender
             .send(BackendNotification::Loading {
                 step: LoadingStep::WritingNetworkKeypair,
-                progress: 0.0,
+                progress: LoadingStep::WritingNetworkKeypair.basic_progress(),
             })
             .await?;
 
@@ -848,7 +883,7 @@ async fn create_networking_stack(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::InstantiatingNetworkingStack,
-            progress: 0.0,
+            progress: LoadingStep::InstantiatingNetworkingStack.basic_progress(),
         })
         .await?;
 
@@ -889,7 +924,7 @@ async fn create_networking_stack(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::NetworkingStackCreatedSuccessfully,
-            progress: 0.0,
+            progress: LoadingStep::NetworkingStackCreatedSuccessfully.basic_progress(),
         })
         .await?;
 
@@ -917,7 +952,7 @@ async fn create_consensus_node(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::CreatingConsensusNode,
-            progress: 0.0,
+            progress: LoadingStep::CreatingConsensusNode.basic_progress(),
         })
         .await?;
 
@@ -943,7 +978,7 @@ async fn create_consensus_node(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::ConsensusNodeCreatedSuccessfully,
-            progress: 0.0,
+            progress: LoadingStep::ConsensusNodeCreatedSuccessfully.basic_progress(),
         })
         .await?;
 
@@ -965,7 +1000,7 @@ async fn create_farmer(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::CreatingFarmer,
-            progress: 0.0,
+            progress: LoadingStep::CreatingFarmer.basic_progress(),
         })
         .await?;
 
@@ -985,7 +1020,7 @@ async fn create_farmer(
     notifications_sender
         .send(BackendNotification::Loading {
             step: LoadingStep::FarmerCreatedSuccessfully,
-            progress: 0.0,
+            progress: LoadingStep::FarmerCreatedSuccessfully.basic_progress(),
         })
         .await?;
 
@@ -1034,13 +1069,14 @@ pub async fn wipe(
     let farms = raw_config.farms();
     for (farm_index, farm) in farms.iter().enumerate() {
         let path = &farm.path;
+        let step = LoadingStep::WipingFarm {
+            farm_index: farm_index as u8,
+            path: path.to_path_buf(),
+        };
         notifications_sender
             .send(BackendNotification::Loading {
-                step: LoadingStep::WipingFarm {
-                    farm_index: farm_index as u8,
-                    path: path.to_path_buf(),
-                },
-                progress: 0.0,
+                step: step.clone(),
+                progress: step.basic_progress(),
             })
             .await?;
 
@@ -1077,12 +1113,13 @@ pub async fn wipe(
 
     {
         let path = &raw_config.node_path();
+        let step = LoadingStep::WipingNode {
+            path: path.to_path_buf(),
+        };
         notifications_sender
             .send(BackendNotification::Loading {
-                step: LoadingStep::WipingNode {
-                    path: path.to_path_buf(),
-                },
-                progress: 0.0,
+                step: step.clone(),
+                progress: step.basic_progress(),
             })
             .await?;
 

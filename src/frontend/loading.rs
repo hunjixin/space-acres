@@ -4,12 +4,13 @@ use relm4::prelude::*;
 
 #[derive(Debug)]
 pub enum LoadingInput {
-    BackendLoading(LoadingStep),
+    BackendLoading((LoadingStep, f32)),
 }
 
 #[derive(Debug)]
 pub struct LoadingView {
     message: String,
+    progress: f64,
 }
 
 #[relm4::component(pub)]
@@ -26,10 +27,12 @@ impl Component for LoadingView {
             set_valign: gtk::Align::Center,
             set_vexpand: true,
             set_orientation: gtk::Orientation::Vertical,
+            set_spacing: 10,
 
-            gtk::Spinner {
-                start: (),
-                set_size_request: (50, 50),
+            gtk::ProgressBar {
+                #[watch]
+                set_fraction: model.progress,
+                set_show_text: true,
             },
 
             gtk::Label {
@@ -46,6 +49,7 @@ impl Component for LoadingView {
     ) -> ComponentParts<Self> {
         let model = Self {
             message: String::new(),
+            progress: 0.0,
         };
 
         let widgets = view_output!();
@@ -61,7 +65,8 @@ impl Component for LoadingView {
 impl LoadingView {
     fn process_input(&mut self, input: LoadingInput) {
         match input {
-            LoadingInput::BackendLoading(step) => {
+            LoadingInput::BackendLoading((step, progress)) => {
+                self.progress = (progress / 100.0) as f64;
                 self.message = match step {
                     LoadingStep::LoadingConfiguration => "Loading configuration...".to_string(),
                     LoadingStep::ReadingConfiguration => "Reading configuration...".to_string(),
