@@ -120,9 +120,11 @@ impl LoadingView {
                     LoadingStep::WipingFarm { farm_index, path } => {
                         format!("Wiping farm {farm_index} at {}...", path.display())
                     }
+                    LoadingStep::WipingFarmSuccessfully => "Wiping farm successfully".to_string(),
                     LoadingStep::WipingNode { path } => {
                         format!("Wiping node at {}...", path.display())
                     }
+                    LoadingStep::WipingNodeSuccessfully => "Wiping node successfully".to_string(),
                 };
             }
         }

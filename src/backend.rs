@@ -173,9 +173,11 @@ pub enum LoadingStep {
         farm_index: u8,
         path: PathBuf,
     },
+    WipingFarmSuccessfully,
     WipingNode {
         path: PathBuf,
     },
+    WipingNodeSuccessfully,
 }
 
 impl LoadingStep {
@@ -207,7 +209,9 @@ impl LoadingStep {
                 farm_index: _,
                 path: _,
             } => 0.0,
-            LoadingStep::WipingNode { path: _ } => 0.0,
+            LoadingStep::WipingFarmSuccessfully => 50.0,
+            LoadingStep::WipingNode { path: _ } => 80.0,
+            LoadingStep::WipingNodeSuccessfully => 100.0,
         }
     }
 }
@@ -1076,7 +1080,10 @@ pub async fn wipe(
         notifications_sender
             .send(BackendNotification::Loading {
                 step: step.clone(),
-                progress: step.basic_progress(),
+                progress: step.basic_progress()
+                    + (LoadingStep::WipingFarmSuccessfully.basic_progress()
+                        - step.basic_progress())
+                        / (farms.len() as f32),
             })
             .await?;
 
@@ -1087,7 +1094,14 @@ pub async fn wipe(
         });
 
         match wipe_fut.await {
-            Ok(Ok(())) => {}
+            Ok(Ok(())) => {
+                notifications_sender
+                    .send(BackendNotification::Loading {
+                        step: LoadingStep::WipingFarmSuccessfully,
+                        progress: LoadingStep::WipingFarmSuccessfully.basic_progress(),
+                    })
+                    .await?;
+            }
             Ok(Err(error)) => {
                 notifications_sender
                     .send(BackendNotification::IrrecoverableError {
@@ -1140,6 +1154,13 @@ pub async fn wipe(
                 }
             }
         }
+
+        notifications_sender
+            .send(BackendNotification::Loading {
+                step: LoadingStep::WipingNodeSuccessfully,
+                progress: LoadingStep::WipingNodeSuccessfully.basic_progress(),
+            })
+            .await?;
     }
 
     Ok(())
