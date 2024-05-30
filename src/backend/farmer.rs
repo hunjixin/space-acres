@@ -405,7 +405,6 @@ where
                     );
                     info!("  Directory: {}", disk_farm.directory.display());
 
-                    
                     if let Ok(farm_index_generic) = farm_index.try_into() {
                         notifications.call_simple(&FarmerNotification::FarmingLog {
                             farm_index: farm_index_generic,
