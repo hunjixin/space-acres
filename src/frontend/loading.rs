@@ -4,11 +4,16 @@ use relm4::prelude::*;
 
 #[derive(Debug)]
 pub enum LoadingInput {
-    BackendLoading((LoadingStep, f32)),
+    BackendLoading {
+        step: LoadingStep,
+        progress: f32,
+        message: String,
+    },
 }
 
 #[derive(Debug)]
 pub struct LoadingView {
+    title: String,
     message: String,
     progress: f64,
 }
@@ -30,9 +35,11 @@ impl Component for LoadingView {
             set_spacing: 10,
 
             gtk::ProgressBar {
+                set_show_text: true,
                 #[watch]
                 set_fraction: model.progress,
-                set_show_text: true,
+                #[watch]
+                set_text: Some(&model.title),
             },
 
             gtk::Label {
@@ -48,6 +55,7 @@ impl Component for LoadingView {
         _sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
         let model = Self {
+            title: String::new(),
             message: String::new(),
             progress: 0.0,
         };
@@ -65,30 +73,26 @@ impl Component for LoadingView {
 impl LoadingView {
     fn process_input(&mut self, input: LoadingInput) {
         match input {
-            LoadingInput::BackendLoading((step, progress)) => {
+            LoadingInput::BackendLoading {
+                step,
+                progress,
+                message,
+            } => {
                 self.progress = (progress / 100.0) as f64;
-                self.message = match step {
+                self.message = message;
+                self.title = match step {
                     LoadingStep::LoadingConfiguration => "Loading configuration...".to_string(),
                     LoadingStep::ReadingConfiguration => "Reading configuration...".to_string(),
-                    LoadingStep::ConfigurationReadSuccessfully {
-                        configuration_exists,
-                    } => {
-                        format!(
-                            "Configuration {}",
-                            if configuration_exists {
-                                "found"
-                            } else {
-                                "not found"
-                            }
-                        )
+                    LoadingStep::ConfigurationReadSuccessfully => {
+                        "Read configuration...".to_string()
                     }
                     LoadingStep::CheckingConfiguration => "Checking configuration...".to_string(),
-                    LoadingStep::ConfigurationIsValid => "Configuration is valid".to_string(),
+                    LoadingStep::ConfigurationIsValid => "Checking configuration".to_string(),
                     LoadingStep::DecodingChainSpecification => {
                         "Decoding chain specification...".to_string()
                     }
                     LoadingStep::DecodedChainSpecificationSuccessfully => {
-                        "Decoded chain specification successfully".to_string()
+                        "Decoding chain specification...".to_string()
                     }
                     LoadingStep::CheckingNodePath => "Checking node path...".to_string(),
                     LoadingStep::CreatingNodePath => "Creating node path...".to_string(),
@@ -117,14 +121,10 @@ impl LoadingView {
                     LoadingStep::FarmerCreatedSuccessfully => {
                         "Farmer created successfully".to_string()
                     }
-                    LoadingStep::WipingFarm { farm_index, path } => {
-                        format!("Wiping farm {farm_index} at {}...", path.display())
-                    }
-                    LoadingStep::WipingFarmSuccessfully => "Wiping farm successfully".to_string(),
-                    LoadingStep::WipingNode { path } => {
-                        format!("Wiping node at {}...", path.display())
-                    }
-                    LoadingStep::WipingNodeSuccessfully => "Wiping node successfully".to_string(),
+                    LoadingStep::WipingFarm => "Wiping farm".to_string(),
+                    LoadingStep::WipedFarmSuccessfully => "Wiped farm successfully".to_string(),
+                    LoadingStep::WipingNode => "Wiping node".to_string(),
+                    LoadingStep::WipedNodeSuccessfully => "Wiped node successfully".to_string(),
                 };
             }
         }
