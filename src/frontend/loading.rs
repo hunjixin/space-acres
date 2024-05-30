@@ -81,43 +81,43 @@ impl LoadingView {
                 self.progress = (progress / 100.0) as f64;
                 self.message = message;
                 self.title = match step {
-                    LoadingStep::LoadingConfiguration => "Loading configuration...".to_string(),
-                    LoadingStep::ReadingConfiguration => "Reading configuration...".to_string(),
+                    LoadingStep::LoadingConfiguration => "Loading configuration".to_string(),
+                    LoadingStep::ReadingConfiguration => "Reading configuration".to_string(),
                     LoadingStep::ConfigurationReadSuccessfully => {
-                        "Read configuration...".to_string()
+                        "Read configuration".to_string()
                     }
-                    LoadingStep::CheckingConfiguration => "Checking configuration...".to_string(),
+                    LoadingStep::CheckingConfiguration => "Checking configuration".to_string(),
                     LoadingStep::ConfigurationIsValid => "Checking configuration".to_string(),
                     LoadingStep::DecodingChainSpecification => {
-                        "Decoding chain specification...".to_string()
+                        "Decoding chain specification".to_string()
                     }
                     LoadingStep::DecodedChainSpecificationSuccessfully => {
-                        "Decoding chain specification...".to_string()
+                        "Decoding chain specification".to_string()
                     }
-                    LoadingStep::CheckingNodePath => "Checking node path...".to_string(),
-                    LoadingStep::CreatingNodePath => "Creating node path...".to_string(),
+                    LoadingStep::CheckingNodePath => "Checking node path".to_string(),
+                    LoadingStep::CreatingNodePath => "Creating node path".to_string(),
                     LoadingStep::NodePathReady => "Node path ready".to_string(),
                     LoadingStep::PreparingNetworkingStack => {
-                        "Preparing networking stack...".to_string()
+                        "Preparing networking stack".to_string()
                     }
-                    LoadingStep::ReadingNetworkKeypair => "Reading network keypair...".to_string(),
+                    LoadingStep::ReadingNetworkKeypair => "Reading network keypair".to_string(),
                     LoadingStep::GeneratingNetworkKeypair => {
-                        "Generating network keypair...".to_string()
+                        "Generating network keypair".to_string()
                     }
                     LoadingStep::WritingNetworkKeypair => {
-                        "Writing network keypair to disk...".to_string()
+                        "Writing network keypair to disk".to_string()
                     }
                     LoadingStep::InstantiatingNetworkingStack => {
-                        "Instantiating networking stack...".to_string()
+                        "Instantiating networking stack".to_string()
                     }
                     LoadingStep::NetworkingStackCreatedSuccessfully => {
                         "Networking stack created successfully".to_string()
                     }
-                    LoadingStep::CreatingConsensusNode => "Creating consensus node...".to_string(),
+                    LoadingStep::CreatingConsensusNode => "Creating consensus node".to_string(),
                     LoadingStep::ConsensusNodeCreatedSuccessfully => {
                         "Consensus node created successfully".to_string()
                     }
-                    LoadingStep::CreatingFarmer => "Creating farmer...".to_string(),
+                    LoadingStep::CreatingFarmer => "Creating farmer".to_string(),
                     LoadingStep::FarmerCreatedSuccessfully => {
                         "Farmer created successfully".to_string()
                     }

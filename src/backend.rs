@@ -1015,7 +1015,7 @@ async fn create_farmer(
         .send(BackendNotification::Loading {
             step: LoadingStep::CreatingFarmer,
             progress: LoadingStep::CreatingFarmer.percentage(),
-            message: "creating farmer ...".to_string(),
+            message: "start to create farmer ...".to_string(),
         })
         .await?;
 

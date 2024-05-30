@@ -409,7 +409,7 @@ where
                         notifications.call_simple(&FarmerNotification::FarmingLog {
                             farm_index: farm_index_generic,
                             message: format!(
-                                "create farm {farm_index} at {}...",
+                                "create farm {farm_index} at {} successfully",
                                 disk_farm.directory.display()
                             ),
                         });
