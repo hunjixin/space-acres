@@ -34,17 +34,19 @@ impl Component for LoadingView {
             set_orientation: gtk::Orientation::Vertical,
             set_spacing: 10,
 
+            gtk::Label {
+                #[watch]
+               set_markup: &format!("<span size=\"medium\" weight=\"medium\">{}</span>", &model.title),
+            },
+
             gtk::ProgressBar {
-                set_show_text: true,
                 #[watch]
                 set_fraction: model.progress,
-                #[watch]
-                set_text: Some(&model.title),
             },
 
             gtk::Label {
                 #[watch]
-                set_label: &model.message,
+               set_markup: &format!("<span color=\"grey\">{}</span>", &model.message),
             },
         }
     }
@@ -83,9 +85,7 @@ impl LoadingView {
                 self.title = match step {
                     LoadingStep::LoadingConfiguration => "Loading configuration".to_string(),
                     LoadingStep::ReadingConfiguration => "Reading configuration".to_string(),
-                    LoadingStep::ConfigurationReadSuccessfully => {
-                        "Read configuration".to_string()
-                    }
+                    LoadingStep::ConfigurationReadSuccessfully => "Read configuration".to_string(),
                     LoadingStep::CheckingConfiguration => "Checking configuration".to_string(),
                     LoadingStep::ConfigurationIsValid => "Checking configuration".to_string(),
                     LoadingStep::DecodingChainSpecification => {
