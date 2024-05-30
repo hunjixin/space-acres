@@ -46,7 +46,7 @@ impl Component for LoadingView {
 
             gtk::Label {
                 #[watch]
-               set_markup: &format!("<span color=\"grey\">{}</span>", &model.message),
+                set_markup: &format!("<span color=\"grey\">{}</span>", &model.message),
             },
         }
     }
